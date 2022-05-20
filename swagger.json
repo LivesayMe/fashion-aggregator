@@ -1,11 +1,12 @@
+
 {
   "swagger": "2.0",
   "info": {
     "title": "CS 341 API",
-    "description": "API for CS 341 Week 04",
+    "description": "API for CS 341 Week 05",
     "version": "1.0.0"
   },
-  "host": "safe-fjord-75598.herokuapp.com",
+  "host": "fashion-aggregator.herokuapp.com/",
   "basePath": "/",
   "schemes": [
     "https"
@@ -13,7 +14,7 @@
   "paths": {
     "/user/{id}": {
       "get": {
-        "description": "",
+        "description": "Get a user",
         "parameters": [
           {
             "name": "id",
@@ -32,7 +33,7 @@
         }
       },
       "put": {
-        "description": "",
+        "description": "Update a user",
         "parameters": [
           {
             "name": "id",
@@ -51,7 +52,7 @@
         }
       },
       "delete": {
-        "description": "",
+        "description": "Delete a user",
         "parameters": [
           {
             "name": "id",
@@ -72,8 +73,42 @@
     },
     "/user": {
       "post": {
-        "description": "",
-        "parameters": [],
+        "description": "Add a user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                  "username": {
+                      "type": "string",
+                      "description": "The username of the user"
+                  },
+                  "email": {
+                      "type": "string",
+                      "description": "The email of the user"
+                  },
+                  "favorites": {
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      },
+                      "description": "The IDs of the favorite outfits of the user"
+                  },
+                  "ratings": {
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      },
+                      "description": "The IDs of the rated outfits of the user"
+                  }
+              },
+              "required": ["username", "email", "favorites", "ratings"]
+          }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -86,7 +121,7 @@
     },
     "/user/{id}/favorites": {
       "get": {
-        "description": "",
+        "description": "Get all the outfits the user has favorited",
         "parameters": [
           {
             "name": "id",
@@ -107,7 +142,7 @@
     },
     "/user/{id}/ratings": {
       "get": {
-        "description": "",
+        "description": "Get all ratings of a user",
         "parameters": [
           {
             "name": "id",
@@ -128,7 +163,7 @@
     },
     "/rating/{id}": {
       "get": {
-        "description": "",
+        "description": "Get a rating",
         "parameters": [
           {
             "name": "id",
@@ -149,7 +184,7 @@
     },
     "/rating": {
       "post": {
-        "description": "",
+        "description": "Adds a rating to the user list and rating list",
         "parameters": [
           {
             "name": "body",
@@ -157,14 +192,21 @@
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "_id": {
-                  "example": "any"
-                }
-              }
-            }
+                  "userId": {
+                      "type": "string",
+                      "description": "The ID of the user who rated the outfit"
+                  },
+                  "outfitId": {
+                      "type": "string",
+                      "description": "The ID of the outfit that was rated"
+                  },
+                  "rating": {
+                      "type": "number",
+                      "description": "The rating of the outfit"
+                  }
+              },
+              "required": ["userId", "outfitId", "rating"]
+          }
           }
         ],
         "responses": {
@@ -179,7 +221,7 @@
     },
     "/outfit": {
       "post": {
-        "description": "",
+        "description": "Gets or generates an outfit randomly",
         "parameters": [],
         "responses": {
           "200": {
@@ -193,7 +235,7 @@
     },
     "/outfit/{id}": {
       "get": {
-        "description": "",
+        "description": "Gets an outfit by ID",
         "parameters": [
           {
             "name": "id",
@@ -212,7 +254,7 @@
         }
       },
       "post": {
-        "description": "",
+        "description": "Adds an outfit to the user's favorite list",
         "parameters": [
           {
             "name": "id",
@@ -245,7 +287,7 @@
     },
     "/outfit/{id}/average": {
       "get": {
-        "description": "",
+        "description": "Returns the average rating of an outfit",
         "parameters": [
           {
             "name": "id",

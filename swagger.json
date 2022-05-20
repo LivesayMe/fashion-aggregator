@@ -6,7 +6,7 @@
     "description": "API for CS 341 Week 05",
     "version": "1.0.0"
   },
-  "host": "fashion-aggregator.herokuapp.com/",
+  "host": "fashion-aggregator.herokuapp.com",
   "basePath": "/",
   "schemes": [
     "https"

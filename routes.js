@@ -114,6 +114,9 @@ router.get('/rating/:id', async function(req, res, next) {
 
 //Add a rating to the database, and add it to the user's ratings
 router.post('/rating', async function(req, res, next) {
+    if(!req.body.userId || !req.body.outfitId) {
+        res.sendStatus(400).send(({"error": "No user id or outfit id provided"}));
+    }
     try {
         const rating = req.body;
         const results = await mongodb.getDb().collection('ratings').insertOne(rating);

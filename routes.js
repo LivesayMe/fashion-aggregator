@@ -7,6 +7,9 @@ const outfit = require('./outfit');
 /* USER ROUTES */
 //Get a user from the database from the param id
 router.get('/user/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const user = await db.collection('users').findOne({_id: new mongo.ObjectID(req.params.id)});
@@ -31,6 +34,9 @@ router.post('/user', async function(req, res, next) {
 
 //Update a user in the database
 router.put('/user/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
     try {
         const user = req.body;
         const results = await mongodb.getDb().collection('users').updateOne({_id: new mongo.ObjectID(req.params.id)}, {$set: user});
@@ -43,6 +49,9 @@ router.put('/user/:id', async function(req, res, next) {
 
 //Delete a user from the database
 router.delete('/user/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
     try {
         const results = await mongodb.getDb().collection('users').deleteOne({_id: new mongo.ObjectID(req.params.id)});
         res.json(results);
@@ -54,6 +63,9 @@ router.delete('/user/:id', async function(req, res, next) {
 
 //Get all favorites outfits from a user
 router.get('/user/:id/favorites', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const user = await db.collection('users').findOne({_id: new mongo.ObjectID(req.params.id)});
@@ -68,6 +80,9 @@ router.get('/user/:id/favorites', async function(req, res, next) {
 
 //Get all ratings from a user
 router.get('/user/:id/ratings', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const user = await db.collection('users').findOne({_id: new mongo.ObjectID(req.params.id)});
@@ -84,6 +99,9 @@ router.get('/user/:id/ratings', async function(req, res, next) {
 
 //Get a rating from the database from the param id
 router.get('/rating/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No rating id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const rating = await db.collection('ratings').findOne({_id: new mongo.ObjectID(req.params.id)});
@@ -132,6 +150,9 @@ router.post('/outfit', async function(req, res, next) {
 
 //Get a outfit by id
 router.get('/outfit/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No outfit id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const outfit = await db.collection('outfits').findOne({_id: new mongo.ObjectID(req.params.id)});
@@ -144,6 +165,9 @@ router.get('/outfit/:id', async function(req, res, next) {
 
 //Aggregate all ratings for a given outfit
 router.get('/outfit/:id/average', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No outfit id provided"}));
+    }
     try {
         const db = await mongodb.getDb();
         const ratings = await db.collection('ratings').find({outfitId: req.params.id}).toArray();
@@ -159,6 +183,13 @@ router.get('/outfit/:id/average', async function(req, res, next) {
 
 //Add an outfit to a users favorites list
 router.post('/outfit/:id', async function(req, res, next) {
+    if (!req.params.id) {
+        res.sendStatus(400).send(({"error": "No outfit id provided"}));
+    }
+    if (!req.body.userId) {
+        res.sendStatus(400).send(({"error": "No user id provided"}));
+    }
+
     try {
         const db = await mongodb.getDb();
         const user = await db.collection('users').findOne({_id: new mongo.ObjectID(req.body.userId)});

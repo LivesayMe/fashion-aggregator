@@ -1,20 +1,26 @@
-
 {
   "swagger": "2.0",
   "info": {
     "title": "CS 341 API",
-    "description": "API for CS 341 Week 05",
+    "description": "API for CS 341 Week 04",
     "version": "1.0.0"
   },
-  "host": "fashion-aggregator.herokuapp.com",
+  "host": "safe-fjord-75598.herokuapp.com",
   "basePath": "/",
   "schemes": [
     "https"
   ],
   "paths": {
-    "/user/{id}": {
+    "/": {
       "get": {
-        "description": "Get a user",
+        "description": "Returns the default page",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/static/css/{id}": {
+      "get": {
+        "description": "Returns any css files that are requested",
         "parameters": [
           {
             "name": "id",
@@ -26,6 +32,62 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/static/js/{id}": {
+      "get": {
+        "description": "Returns any js files that are requested",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/manifest.json": {
+      "get": {
+        "description": "Returns the manifest file",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "description": "Returns user data if the token allows access (user ID matches and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -33,11 +95,29 @@
         }
       },
       "put": {
-        "description": "Update a user",
+        "description": "Updates a user's data if the token allows access (user ID matches and can delete)",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "session": {
+                  "example": "any"
+                }
+              }
+            }
+          },
+          {
+            "name": "session",
+            "in": "body",
             "required": true,
             "type": "string"
           }
@@ -46,17 +126,41 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       },
       "delete": {
-        "description": "Delete a user",
+        "description": "Deletes a user's data if the token allows access (user ID matches and can delete)",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "session": {
+                  "example": "any"
+                }
+              }
+            }
+          },
+          {
+            "name": "session",
+            "in": "body",
             "required": true,
             "type": "string"
           }
@@ -64,6 +168,12 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -73,145 +183,64 @@
     },
     "/user": {
       "post": {
-        "description": "Add a user",
+        "description": "Creates a new user from a username and password and returns a session token and ID of the inserted document",
         "parameters": [
           {
-            "name": "body",
+            "name": "user",
             "in": "body",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                  "username": {
-                      "type": "string",
-                      "description": "The username of the user"
-                  },
-                  "email": {
-                      "type": "string",
-                      "description": "The email of the user"
-                  },
-                  "favorites": {
-                      "type": "array",
-                      "items": {
-                          "type": "string"
-                      },
-                      "description": "The IDs of the favorite outfits of the user"
-                  },
-                  "ratings": {
-                      "type": "array",
-                      "items": {
-                          "type": "string"
-                      },
-                      "description": "The IDs of the rated outfits of the user"
+                "username": {
+                  "example": "test@email.com"
+                },
+                "password": {
+                  "example": "12345"
+                },
+                "firstName": {
+                  "example": "Hunter"
+                },
+                "lastName": {
+                  "example": "Livesay"
+                },
+                "favorites": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
-              },
-              "required": ["username", "email", "favorites", "ratings"]
-          }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/user/{id}/favorites": {
-      "get": {
-        "description": "Get all the outfits the user has favorited",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/user/{id}/ratings": {
-      "get": {
-        "description": "Get all ratings of a user",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/rating/{id}": {
-      "get": {
-        "description": "Get a rating",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/rating": {
-      "post": {
-        "description": "Adds a rating to the user list and rating list",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                  "userId": {
-                      "type": "string",
-                      "description": "The ID of the user who rated the outfit"
-                  },
-                  "outfitId": {
-                      "type": "string",
-                      "description": "The ID of the outfit that was rated"
-                  },
-                  "rating": {
-                      "type": "number",
-                      "description": "The rating of the outfit"
+                },
+                "ratings": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
-              },
-              "required": ["userId", "outfitId", "rating"]
-          }
+                },
+                "embedding": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "styles": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -219,57 +248,55 @@
         }
       }
     },
-    "/outfit": {
+    "/user/token": {
       "post": {
-        "description": "Gets or generates an outfit randomly",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/outfit/{id}": {
-      "get": {
-        "description": "Gets an outfit by ID",
+        "description": "Creates a new user from a google token and returns a session token and ID of the inserted document",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "post": {
-        "description": "Adds an outfit to the user's favorite list",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
+            "name": "user",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "any"
+                "username": {
+                  "example": "test@email.com"
+                },
+                "password": {
+                  "example": "12345"
+                },
+                "firstName": {
+                  "example": "Hunter"
+                },
+                "lastName": {
+                  "example": "Livesay"
+                },
+                "favorites": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "ratings": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "embedding": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "styles": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -285,9 +312,341 @@
         }
       }
     },
+    "/user/authenticate": {
+      "post": {
+        "description": "Checks if a user exists and returns a session token if the password matches",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/user/{id}/favorites": {
+      "get": {
+        "description": "Returns a list of all the user's favorite outfits if the token allows access(user ID matches and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/user/{id}/ratings": {
+      "get": {
+        "description": "Returns a list of all the user's ratings if the token allows access(user ID matches and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/user/{id}/logout": {
+      "delete": {
+        "description": "Logs out a user by deleting any sessions related to them if the token allows access(user ID matches and can delete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/user/{id}/embedding": {
+      "get": {
+        "description": "Returns a user's embedding if the token allows access(user ID matches and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/rating/{id}": {
+      "get": {
+        "description": "Gets a rating by id if the token allows access (userID matches rating createdByID and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/rating": {
+      "post": {
+        "description": "Adds a rating for a given user if the token allows access (userID matches and can write)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "outfitId": {
+                  "example": "any"
+                },
+                "styles": {
+                  "example": [],
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "rating": {
+                  "example": 1
+                }
+              }
+            }
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/outfit": {
+      "post": {
+        "description": "Generates a new outfit based on the user's embedding and the styles they have selected, has a chance of generating a new outfit, instaed of selecting one from the database. ",
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/outfit/{id}": {
+      "get": {
+        "description": "Returns an outfit by id if the token allows access (userID matches and can read)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "description": "Adds an outfit to a user's favorite list",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "session": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/outfit/{id}/average": {
       "get": {
-        "description": "Returns the average rating of an outfit",
+        "description": "Returns the average rating given to an outfit",
         "parameters": [
           {
             "name": "id",

@@ -15,7 +15,7 @@ admin.initializeApp({
 });
 
 
-const saltRounds = 10;
+const saltRounds = 12;
 
 //Default index route
 router.get('/', function(req, res, next) {

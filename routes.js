@@ -71,6 +71,7 @@ router.post('/user', async function(req, res, next) {
         const userExists = await db.collection('users').findOne({username: user.username});
         if (userExists) {
             res.sendStatus(400).send(({"error": "Username already taken"}));
+            return;
         }
 
         var password = req.body.password;
@@ -143,12 +144,14 @@ router.post('/user/authenticate', async function(req, res, next) {
 router.put('/user/:id', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
     var authorized = await authorizeSession(session, false, false, true, true, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const user = req.body;
@@ -164,12 +167,14 @@ router.put('/user/:id', async function(req, res, next) {
 router.delete('/user/:id', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
     var authorized = await authorizeSession(session, false, false, true, false, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const results = await mongodb.getDb().collection('users').deleteOne({_id: new mongo.ObjectID(req.params.id)});
@@ -184,12 +189,14 @@ router.delete('/user/:id', async function(req, res, next) {
 router.get('/user/:id/favorites', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
     var authorized = await authorizeSession(session, false, false, false, true, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -207,6 +214,7 @@ router.get('/user/:id/favorites', async function(req, res, next) {
 router.get('/user/:id/ratings', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
 
     //Ensure authorization
@@ -214,6 +222,7 @@ router.get('/user/:id/ratings', async function(req, res, next) {
     var authorized = await authorizeSession(session, false, false, false, true, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -238,6 +247,7 @@ router.delete('/user/:id/logout', async function(req, res, next) {
     var authorized = await authorizeSession(session, false, false, true, false, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -253,12 +263,14 @@ router.delete('/user/:id/logout', async function(req, res, next) {
 router.get('/user/:id/embedding', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
     var authorized = await authorizeSession(session, false, false, false, true, req.params.id);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -350,7 +362,7 @@ async function authorizeSession(token, review, upload, docDelete, read, uid) {
     {
         return "User doesn't have permission to read";
     }
-    if(sessionDetails.timestamp < new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7)))
+    if(sessionDetails.timestamp < new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7)) || sessionDetails == -1)
     {
         return "Session expired";
     }
@@ -376,6 +388,7 @@ async function deleteSession(token) {
 router.get('/rating/:id', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No rating id provided"}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -391,12 +404,14 @@ router.get('/rating/:id', async function(req, res, next) {
 router.post('/rating', async function(req, res, next) {
     if(!req.body.userId || !req.body.outfitId) {
         res.sendStatus(400).send(({"error": "No user id or outfit id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
     var authorized = await authorizeSession(session, true, false, false, false, req.body.userId);
     if (authorized !== true) {
         res.sendStatus(401).send(({"error": authorized}));
+        return;
     }
     try {
         const rating = req.body;
@@ -419,12 +434,14 @@ router.post('/outfit', async function(req, res, next) {
     try {
         if (Math.random() < 0.25) {
             res.json(await outfit.generateOutfit());
+            return;
         } else {
             const db = await mongodb.getDb();
             const results = await db.collection('outfits').aggregate([
                 {$sample: {size: 1}}
             ]).toArray();
             res.json(results[0]);
+            return;
         }
     } catch (err) {
         console.log(err);
@@ -436,11 +453,13 @@ router.post('/outfit', async function(req, res, next) {
 router.get('/outfit/:id', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No outfit id provided"}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
         const outfit = await db.collection('outfits').findOne({_id: new mongo.ObjectID(req.params.id)});
         res.json(outfit);
+        return;
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
@@ -451,6 +470,7 @@ router.get('/outfit/:id', async function(req, res, next) {
 router.get('/outfit/:id/average', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No outfit id provided"}));
+        return;
     }
     try {
         const db = await mongodb.getDb();
@@ -469,9 +489,11 @@ router.get('/outfit/:id/average', async function(req, res, next) {
 router.post('/outfit/:id', async function(req, res, next) {
     if (!req.params.id) {
         res.sendStatus(400).send(({"error": "No outfit id provided"}));
+        return;
     }
     if (!req.body.userId) {
         res.sendStatus(400).send(({"error": "No user id provided"}));
+        return;
     }
     //Ensure authorization
     const session = req.body.session;
